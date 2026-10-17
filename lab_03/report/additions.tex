@@ -1,0 +1,27 @@
+\ssr{ПРИЛОЖЕНИЕ А}
+\setcounter{lstlisting}{0}
+\renewcommand{\thelstlisting}{А.\arabic{lstlisting}}
+
+\begin{lstlisting}[label={lst:recursive}, caption={Рекурсивная функция вывода чисел в диапазоне от A до B}, numbers=left]
+void print_numbers_recursive(int a, int b)
+{
+	if (b > a)
+	{
+		print_numbers_recursive(a, b - 1);
+	}
+	std::cout << b << " ";
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label={lst:iterative}, caption={Итеративная функция вывода чисел в диапазоне от A до B}, numbers=left]
+void print_numbers_iterative(int a, int b)
+{
+	if (a <= b)
+	{
+		for (int i = a; i <= b; i++)
+		{
+			std::cout << i << " ";
+		}
+	}
+}
+\end{lstlisting}
