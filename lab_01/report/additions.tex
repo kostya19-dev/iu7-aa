@@ -1,0 +1,172 @@
+\chapter*{ПРИЛОЖЕНИЕ А}
+
+
+\begin{lstlisting}[label={lst:standard}, caption={Реализация стандартного алгоритма умножения матриц}]
+	matrix_v standart_multy(const matrix_v &mtr1, const matrix_v &mtr2)
+	{
+		if (mtr1.empty() || mtr2.empty() || mtr1[0].empty() || mtr2[0].empty())
+		return empty_matrix();
+		
+		if (mtr1[0].size() != mtr2.size())
+		return empty_matrix();
+		
+		size_t n = mtr1.size();
+		size_t m = mtr2.size();
+		size_t t = mtr2[0].size();
+		
+		matrix_v res;
+		array_v row;
+		row.resize(t, 0);
+		res.resize(n, row);
+		
+		for (size_t i = 0; i < n; i++)
+		{
+			for (size_t j = 0; j < t; j++)
+			{
+				for (size_t k = 0; k < m; k++)
+				{
+					res[i][j] += mtr1[i][k] * mtr2[k][j];
+				}
+			}
+		}
+		
+		return res;
+	}
+\end{lstlisting}
+
+\clearpage
+
+\begin{lstlisting}[label={lst:vinograd}, caption={Реализация алгоритма Винограда}]
+	matrix_v vinograd_alg(const matrix_v &mtr1, const matrix_v &mtr2)
+	{
+		if (mtr1.empty() || mtr2.empty() || mtr1[0].empty() || mtr2[0].empty())
+		return empty_matrix();
+		
+		if (mtr1[0].size() != mtr2.size())
+		return empty_matrix();
+		
+		size_t n = mtr1.size();
+		size_t m = mtr2.size();
+		size_t t = mtr2[0].size();
+		
+		matrix_v res;
+		array_v rowSum, colSum;
+		rowSum.resize(n, 0);
+		colSum.resize(t, 0);
+		
+		array_v row;
+		row.resize(t, 0);
+		res.resize(n, row);
+		
+		for (size_t i = 0; i < n; i++)
+		{
+			for (size_t j = 0; j < m / 2; j++)
+			{
+				rowSum[i] += mtr1[i][2 * j] * mtr1[i][2 * j + 1];
+			}
+		}
+		
+		for (size_t i = 0; i < t; i++)
+		{
+			for (size_t j = 0; j < m / 2; j++)
+			{
+				colSum[i] += mtr2[2 * j][i] * mtr2[2 * j + 1][i];
+			}
+		}
+		
+		for (size_t i = 0; i < n; i++)
+		{
+			for (size_t j = 0; j < t; j++)
+			{
+				res[i][j] = -rowSum[i] - colSum[j];
+				for (size_t k = 0; k < m / 2; k++)
+				{
+					res[i][j] += (mtr1[i][2 * k] + mtr2[2 * k + 1][j]) * 
+					(mtr1[i][2 * k + 1] + mtr2[2 * k][j]);
+				}
+			}
+		}
+		
+		if (m % 2 == 1)
+		{
+			for(size_t i = 0; i < n; i++)
+			{
+				for(size_t j = 0; j < t; j++)
+				{
+					res[i][j] += mtr1[i][m - 1] * mtr2[m - 1][j];
+				}
+			}
+		}
+		
+		return res;
+	}
+\end{lstlisting}
+
+\clearpage
+
+\begin{lstlisting}[label={lst:opt_vinograd}, caption={Реализация оптимизированного алгоритма Винограда}]
+	matrix_v opt_vinograd_alg(const matrix_v &mtr1, const matrix_v &mtr2)
+	{
+		if (mtr1.empty() || mtr2.empty() || mtr1[0].empty() || mtr2[0].empty())
+		return empty_matrix();
+		
+		if (mtr1[0].size() != mtr2.size())
+		return empty_matrix();
+		
+		size_t n = mtr1.size();
+		size_t m = mtr2.size();
+		size_t t = mtr2[0].size();
+		size_t halfm = m >> 1;
+		
+		matrix_v res;
+		array_v rowSum, colSum;
+		rowSum.resize(n, 0);
+		colSum.resize(t, 0);
+		
+		array_v row;
+		row.resize(t, 0);
+		res.resize(n, row);
+		
+		for (size_t i = 0; i < n; i++)
+		{
+			for (size_t j = 0; j < halfm; j++)
+			{
+				size_t j2 = j << 1;
+				rowSum[i] += mtr1[i][j2] * mtr1[i][j2 + 1];
+			}
+		}
+		
+		for (size_t i = 0; i < t; i++)
+		{
+			for (size_t j = 0; j < halfm; j++)
+			{
+				size_t j2 = j << 1;
+				colSum[i] += mtr2[j2][i] * mtr2[j2 + 1][i];
+			}
+		}
+		
+		for (size_t i = 0; i < n; i++)
+		{
+			for (size_t j = 0; j < t; j++)
+			{
+				int temp = -rowSum[i] - colSum[j];
+				
+				for (size_t k = 0; k < halfm; k++)
+				{
+					size_t k2 = k << 1;
+					temp += (mtr1[i][k2] + mtr2[k2 + 1][j]) * 
+					(mtr1[i][k2 + 1] + mtr2[k2][j]);
+				}
+				
+				if (m & 1)
+				{
+					temp += mtr1[i][m - 1] * mtr2[m - 1][j];
+				}
+				
+				res[i][j] = temp;
+			}
+		}
+		
+		return res;
+	}
+\end{lstlisting}
